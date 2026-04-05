@@ -6,8 +6,4 @@ export interface Note {
   createdAt: string;
 }
 
-export interface CreateNoteDto {
-  title: string;
-  content: string;
-  tag: string;
-}
+export type NewNote = Omit<Note, 'id' | 'createdAt'>;
