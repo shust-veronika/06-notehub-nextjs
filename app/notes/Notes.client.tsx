@@ -1,9 +1,9 @@
 'use client';
 import { useQuery } from '@tanstack/react-query';
 import { fetchNotes } from '@/lib/api';
-import NoteList from '@/app/components/NoteList/NoteList';
-import NoteForm from '@/app/components/NoteForm/NoteForm';
-import SearchBox from '@/app/components/SearchBox/SearchBox';
+import NoteList from '@/components/NoteList/NoteList';
+import NoteForm from '@/components/NoteForm/NoteForm';
+import SearchBox from '@/components/SearchBox/SearchBox';
 import { useState } from 'react';
 
 export default function NotesClient() {
