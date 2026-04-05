@@ -1,28 +1,69 @@
 'use client';
-import { useQuery } from '@tanstack/react-query';
+
+import { useState } from 'react';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { useDebounce } from 'use-debounce'; 
 import { fetchNotes } from '@/lib/api';
 import NoteList from '@/components/NoteList/NoteList';
 import NoteForm from '@/components/NoteForm/NoteForm';
 import SearchBox from '@/components/SearchBox/SearchBox';
-import { useState } from 'react';
+import Modal from '@/components/Modal/Modal'; 
+import ReactPaginate from 'react-paginate'; 
 
 export default function NotesClient() {
-  const [filter, setFilter] = useState('');
-  
-  const { data: notes = [] } = useQuery({
-    queryKey: ['notes'],
-    queryFn: fetchNotes,
+  const [search, setSearch] = useState<string>('');
+  const [page, setPage] = useState<number>(1);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const [debouncedSearch] = useDebounce(search, 500);
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['notes', page, debouncedSearch], 
+    queryFn: () => fetchNotes(page, debouncedSearch),
+    placeholderData: keepPreviousData, 
   });
 
-  const filteredNotes = notes.filter(note => 
-    note.title.toLowerCase().includes(filter.toLowerCase())
-  );
+  const handlePageClick = (event: { selected: number }) => {
+    setPage(event.selected + 1);
+  };
+
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    setPage(1); 
+  };
 
   return (
-    <div>
-      <NoteForm />
-      <SearchBox value={filter} onSearch={setFilter} />
-      <NoteList notes={filteredNotes} />
+    <div className="container">
+      <button onClick={() => setIsModalOpen(true)}>Add New Note</button>
+
+      {isModalOpen && (
+        <Modal onClose={() => setIsModalOpen(false)}>
+          <NoteForm onSuccess={() => setIsModalOpen(false)} />
+        </Modal>
+      )}
+
+      <SearchBox value={search} onSearch={handleSearch} />
+
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : isError ? (
+        <p>Error loading notes.</p>
+      ) : (
+        <>
+          <NoteList notes={data?.notes || []} />
+          
+          <ReactPaginate
+            breakLabel="..."
+            nextLabel="next >"
+            onPageChange={handlePageClick}
+            pageRangeDisplayed={5}
+            pageCount={data?.totalPages || 0}
+            forcePage={page - 1}
+            previousLabel="< previous"
+            containerClassName="pagination"
+          />
+        </>
+      )}
     </div>
   );
 }
