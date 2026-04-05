@@ -1,17 +1,21 @@
 'use client';
-import { useParams, useRouter } from 'next/navigation';
+
 import { useQuery } from '@tanstack/react-query';
-import { fetchNoteById } from '@/lib/api'; 
+import { useRouter } from 'next/navigation';
+import { fetchNoteById } from '@/lib/api';
 import css from './NoteDetails.module.css';
 
-export default function NoteDetailsClient() {
-  const { id } = useParams();
+interface Props {
+  noteId: string;
+}
+
+export default function NoteDetailsClient({ noteId }: Props) {
   const router = useRouter();
 
   const { data: note, isLoading, error } = useQuery({
-    queryKey: ['note', id],
-    queryFn: () => fetchNoteById(id as string),
-    enabled: !!id,
+    queryKey: ['note', noteId],
+    queryFn: () => fetchNoteById(noteId),
+    enabled: !!noteId,
   });
 
   if (isLoading) return <p className={css.container}>Loading, please wait...</p>;
@@ -23,7 +27,7 @@ export default function NoteDetailsClient() {
         <button onClick={() => router.back()} className={css.backBtn}>
           ← Back to list
         </button>
-        
+
         <div className={css.item}>
           <div className={css.header}>
             <h2>{note.title}</h2>
