@@ -8,7 +8,7 @@ import NoteList from '@/components/NoteList/NoteList';
 import NoteForm from '@/components/NoteForm/NoteForm';
 import SearchBox from '@/components/SearchBox/SearchBox';
 import Modal from '@/components/Modal/Modal'; 
-import ReactPaginate from 'react-paginate'; 
+import Pagination from '@/components/Pagination/Pagination'; 
 
 export default function NotesClient() {
   const [search, setSearch] = useState<string>('');
@@ -23,8 +23,8 @@ export default function NotesClient() {
     placeholderData: keepPreviousData, 
   });
 
-  const handlePageClick = (event: { selected: number }) => {
-    setPage(event.selected + 1);
+  const handlePageClick = (newPage: number) => {
+    setPage(newPage);
   };
 
   const handleSearch = (value: string) => {
@@ -52,15 +52,11 @@ export default function NotesClient() {
         <>
           <NoteList notes={data?.notes || []} />
           
-          <ReactPaginate
-            breakLabel="..."
-            nextLabel="next >"
-            onPageChange={handlePageClick}
-            pageRangeDisplayed={5}
+          {}
+          <Pagination 
             pageCount={data?.totalPages || 0}
-            forcePage={page - 1}
-            previousLabel="< previous"
-            containerClassName="pagination"
+            currentPage={page}
+            onPageChange={handlePageClick}
           />
         </>
       )}
