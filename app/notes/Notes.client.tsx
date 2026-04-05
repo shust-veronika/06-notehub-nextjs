@@ -1,27 +1,28 @@
 'use client';
-import { useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { fetchNoteById } from '../lib/api/noteApi';
-import css from './NoteDetails.module.css';
+import { fetchNotes } from '../lib/api/noteApi';
+import NoteList from '../components/NoteList/NoteList';
+import NoteForm from '../components/NoteForm/NoteForm';
+import SearchBox from '../components/SearchBox/SearchBox';
+import { useState } from 'react';
 
-export default function NoteDetailsClient() {
-  const { id } = useParams();
-  const { data: note, isLoading, error } = useQuery({
-    queryKey: ['note', id],
-    queryFn: () => fetchNoteById(id as string),
+export default function NotesClient() {
+  const [filter, setFilter] = useState('');
+  
+  const { data: notes = [] } = useQuery({
+    queryKey: ['notes'],
+    queryFn: fetchNotes,
   });
 
-  if (isLoading) return <p>Loading, please wait...</p>;
-  if (error || !note) return <p>Something went wrong.</p>;
+  const filteredNotes = notes.filter(note => 
+    note.title.toLowerCase().includes(filter.toLowerCase())
+  );
 
   return (
-    <div className={css.container}>
-      <div className={css.item}>
-        <div className={css.header}><h2>{note.title}</h2></div>
-        <p className={css.tag}>{note.tag}</p>
-        <p className={css.content}>{note.content}</p>
-        <p className={css.date}>{new Date(note.createdAt).toLocaleString()}</p>
-      </div>
+    <div>
+      <NoteForm />
+      <SearchBox value={filter} onSearch={setFilter} />
+      <NoteList notes={filteredNotes} />
     </div>
   );
 }
