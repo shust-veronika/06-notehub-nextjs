@@ -1,7 +1,7 @@
 'use client';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { fetchNoteById } from '../../lib/api/noteApi'; // Використовуйте аліас @ для надійності
+import { fetchNoteById } from '@/lib/api/noteApi'; 
 import css from './NoteDetails.module.css';
 
 export default function NoteDetailsClient() {
